@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssrs.mapper.AnswerMapper">
+
+    <!-- 开启二级缓存 -->
+    <!--<cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>-->
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ssrs.model.Answer">
+        <id column="id" property="id" />
+        <result column="answer" property="answer" />
+        <result column="answer_no" property="answerNo" />
+        <result column="test_id" property="testId" />
+        <result column="is_true" property="isTrue" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, answer, answer_no, test_id, is_true
+    </sql>
+
+    <select id="getAnswerByTestId" parameterType="Long" resultMap="BaseResultMap">
+        select * from m_answer where test_id = #{id};
+    </select>
+
+    <select id="getNextId" resultType="Long" >
+        select ifnull(max(id),0)+1 from m_answer;
+    </select>
+
+    <delete id="deleteByTestId" parameterType="Long">
+        delete from m_answer where test_id = #{id}
+    </delete>
+</mapper>

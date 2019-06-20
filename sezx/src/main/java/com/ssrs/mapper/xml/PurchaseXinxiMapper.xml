@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssrs.mapper.PurchaseXinxiMapper">
+
+    <!-- 开启二级缓存 -->
+    <!--<cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>-->
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ssrs.model.PurchaseXinxi">
+        <id column="id" property="id" />
+        <result column="bianhao" property="bianhao" />
+        <result column="purchase_num" property="purchaseNum" />
+        <result column="total_amount" property="totalAmount" />
+        <result column="customer_phone" property="customerPhone" />
+        <result column="customer_id" property="customerId" />
+        <result column="discount_id" property="discountId" />
+        <result column="discount_amount" property="discountAmount" />
+        <result column="customer_name" property="customerName" />
+        <result column="customer_type" property="customerType" />
+        <result column="is_payment" property="isPayment" />
+        <result column="pay_type" property="payType" />
+        <result column="purchase_time" property="purchaseTime" />
+        <result column="trade_number" property="tradeNumber" />
+        <result column="ismakepact" property="ismakepact" />
+        <result column="outTradeNo" property="outTradeNo" />
+        <result column="pay_record_id" property="payRecordId" />
+    </resultMap>
+
+
+
+
+    <resultMap id="pxResultMap" type="com.ssrs.model.PurchaseXinxi">
+        <id column="id" property="id" />
+        <result column="bianhao" property="bianhao" />
+        <result column="purchase_num" property="purchaseNum" />
+        <result column="total_amount" property="totalAmount" />
+        <result column="customer_phone" property="customerPhone" />
+        <result column="customer_id" property="customerId" />
+        <result column="discount_id" property="discountId" />
+        <result column="discount_amount" property="discountAmount" />
+        <result column="customer_name" property="customerName" />
+        <result column="customer_type" property="customerType" />
+        <result column="is_payment" property="isPayment" />
+        <result column="pay_type" property="payType" />
+        <result column="purchase_time" property="purchaseTime" />
+        <result column="trade_number" property="tradeNumber" />
+        <result column="ismakepact" property="ismakepact" />
+        <result column="outTradeNo" property="outTradeNo" />
+        <result column="pay_record_id" property="payRecordId" />
+        <collection property="purchaseMingxis" column="id" ofType="com.ssrs.model.PurchaseMingxi"
+                    select="com.ssrs.mapper.PurchaseMingxiMapper.getBeansByPXId"></collection>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, login_id, login_pwd, touxiang, nickname, mobile, create_time, verify_code, verify_code_time, ischeck, status
+    </sql>
+
+    <select id="getBeanById" resultMap="pxResultMap" parameterType="Long">
+        select *
+          from m_purchase_xinxi
+          where id = #{id}
+    </select>
+
+    <select id="getAllBean" resultMap="pxResultMap" resultType="ArrayList">
+        select *
+          from m_purchase_xinxi
+    </select>
+
+    <insert id="insertByReducePoJo" parameterType="com.ssrs.model.PurchaseXinxi" >
+          insert into m_purchase_xinxi
+            (
+                bianhao,purchase_num,total_amount,customer_phone,
+                customer_id,discount_id,discount_amount,
+                customer_name,customer_type,is_payment,pay_type,purchase_time,
+                trade_number,ismakepact,outTradeNo,pay_record_id
+            )
+            values
+            (
+                #{bianhao},#{purchaseNum},#{totalAmount},#{customerPhone},#{customerId},#{discountId},
+                #{discountAmount},#{customerName},#{customerType},#{isPayment},#{payType},#{purchaseTime},#{tradeNumber},
+                #{ismakepact},#{outTradeNo},#{payRecordId}
+            )
+    </insert>
+
+    <update id="updateByReducePoJo" parameterType="com.ssrs.model.PurchaseXinxi" >
+          update m_purchase_xinxi set
+
+               bianhao = #{bianhao},
+               purchase_num = #{purchaseNum},
+               total_amount = #{totalAmount},
+               customer_phone = #{customerPhone},
+                customer_id = #{customerId},
+                discount_id = #{discountId},
+                discount_amount = #{discountAmount},
+                customer_name = #{customerName},
+                customer_type = #{customerType},
+                is_payment = #{isPayment},
+                pay_type = #{payType},
+                purchase_time = #{purchaseTime},
+                trade_number = #{tradeNumber},
+                ismakepact = #{ismakepact},
+                outTradeNo = #{outTradeNo},
+                pay_record_id = #{payRecordId}
+                where
+                  id = #{id};
+    </update>
+
+    <insert id="addGetId" parameterType="com.ssrs.model.PurchaseXinxi" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into m_purchase_xinxi
+          (
+             purchase_num,total_amount,customer_phone,
+             customer_id,discount_id,discount_amount,
+             customer_name,customer_type,is_payment,purchase_time
+          )
+          values
+          (
+            #{purchaseNum},#{totalAmount},#{customerPhone}
+            ,#{customerId},#{discountId},#{discountAmount}
+            ,#{customerName},#{customerType},#{isPayment},#{purchaseTime}
+          )
+    </insert>
+
+    <select id="getPurchaseVos" parameterType="Integer" resultType="com.ssrs.vo.PurchaseVo">
+        select
+          mpx.id id,mpx.bianhao bianhao,mpx.purchase_num purchaseNum,
+          mpx.total_amount totalAmount,mpx.customer_phone customerPhone,
+          mpx.customer_id customerId,mpx.discount_id discountId,
+          mpx.discount_amount discountAmount,
+          mpx.customer_name customerName,mpx.customer_type customerType,
+          mpx.is_payment isPayment,
+          mpx.pay_type payType,mpx.purchase_time purchaseTime,mpx.trade_number tradeNumber,
+          mpx.ismakepact ismakepact,mpx.outTradeNo outTradeNo,
+          mpx.pay_record_id payRecordId,
+          mpm.id mingXiId,mpm.goods_id goodsId,mpm.goods_name goodsName,
+          mpm.goods_unit_price goodsUnitPrice,mpm.goods_amount goodsAmount,
+          mpm.goods_total_price goodsTotalPrice
+        from
+          m_purchase_xinxi mpx left join m_purchase_mingxi mpm on mpx.id = mpm.purchase_xinxi_id
+        <where>
+            <if test="map.type == 0 or map.type == 1"> mpx.is_payment=#{map.type}</if>
+            <if test="map.userId != null and map.userId != ''"> and mpx.customer_id=#{map.userId}</if>
+            <if test="map.userType!=null and map.userType != ''"> and mpx.customer_type=#{map.userType}</if>
+
+        </where>
+        group by mpx.id
+    </select>
+
+    <update id="gotoPay" parameterType="Long">
+        update m_purchase_xinxi set is_payment = 1 where id = #{id}
+    </update>
+
+</mapper>

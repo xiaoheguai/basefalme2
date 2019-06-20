@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssrs.mapper.TeacherMapper">
+
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ssrs.model.Teacher">
+        <id column="id" property="id" />
+        <result column="login_id" property="loginId" />
+        <result column="login_pwd" property="loginPwd" />
+        <result column="touxiang" property="touxiang" />
+        <result column="nickname" property="nickname" />
+        <result column="sign" property="sign" />
+        <result column="mobile" property="mobile" />
+        <result column="create_time" property="createTime" />
+        <result column="verify_code" property="verifyCode" />
+        <result column="verify_code_time" property="verifyCodeTime" />
+        <result column="ischeck" property="ischeck" />
+        <result column="status" property="status" />
+    </resultMap>
+
+    <resultMap id="tResultMap" type="com.ssrs.model.Teacher">
+        <id column="id" property="id" />
+        <result column="login_id" property="loginId" />
+        <result column="login_pwd" property="loginPwd" />
+        <result column="touxiang" property="touxiang" />
+        <result column="nickname" property="nickname" />
+        <result column="sign" property="sign" />
+        <result column="mobile" property="mobile" />
+        <result column="create_time" property="createTime" />
+        <result column="verify_code" property="verifyCode" />
+        <result column="verify_code_time" property="verifyCodeTime" />
+        <result column="ischeck" property="ischeck" />
+        <result column="status" property="status" />
+        <collection property="students" column="id" select="com.ssrs.mapper.StudentTeacherMapper.getStudentsByTeacherId"></collection>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, login_id, login_pwd, touxiang, nickname, mobile, create_time, verify_code, verify_code_time, ischeck, status
+    </sql>
+
+    <select id="getBeanById" resultMap="tResultMap" parameterType="Long">
+        select *
+          from m_teacher
+          where id = #{id}
+    </select>
+
+    <select id="getAllBean" resultMap="tResultMap" resultType="ArrayList">
+        select *
+          from m_teacher
+    </select>
+
+    <insert id="insertByReducePoJo" parameterType="com.ssrs.model.Teacher" >
+          insert m_teacher
+            (
+                login_id,login_pwd,touxiang,nickname,sign,mobile,create_time
+            )
+            values
+            (
+                #{loginId},#{loginPwd},#{touxiang},#{nickname},#{sign},#{mobile},#{createTime}
+            )
+    </insert>
+
+    <update id="updateByReducePoJo" parameterType="com.ssrs.model.Teacher" >
+          update m_teacher set
+                login_id = #{loginId},
+                login_pwd = #{loginPwd},
+                touxiang = #{touxiang},
+                nickname = #{nickname},
+                mobile = #{mobile}
+                where
+                  id = #{id};
+    </update>
+
+    <update id="updateByParam" parameterType="java.util.HashMap">
+        update m_teacher
+        <set>
+            <if test="param.loginId != null and param.loginId !=''">
+                login_id = #{param.loginId},
+            </if>
+            <if test="param.touxiang != null and param.touxiang !=''">
+                touxiang = #{param.touxiang},
+            </if>
+            <if test="param.nickname != null and param.nickname !=''">
+                nickname = #{param.nickname},
+            </if>
+            <if test="param.sign != null and param.sign !=''">
+                sign = #{param.sign},
+            </if>
+            <if test="param.mobile != null and param.mobile !=''">
+                mobile = #{param.mobile},
+            </if>
+        </set>
+        where
+        <choose>
+            <when test="param.id != null and param.id !=''">
+                id = #{param.id}
+            </when>
+            <otherwise>
+                1>1
+            </otherwise>
+        </choose>
+    </update>
+
+</mapper>

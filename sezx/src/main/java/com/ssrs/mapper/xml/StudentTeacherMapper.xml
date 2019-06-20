@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssrs.mapper.StudentTeacherMapper">
+
+    <!--&lt;!&ndash; 开启二级缓存 &ndash;&gt;-->
+    <!--<cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>-->
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ssrs.model.StudentTeacher">
+        <id column="student_id" property="studentId" />
+        <result column="teacher_id" property="teacherId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        student_id, teacher_id
+    </sql>
+
+    <resultMap id="TeaMap_1" type="com.ssrs.model.Teacher">
+        <id column="id" property="id" />
+        <result column="login_id" property="loginId" />
+        <result column="login_pwd" property="loginPwd" />
+        <result column="touxiang" property="touxiang" />
+        <result column="nickname" property="nickname" />
+        <result column="mobile" property="mobile" />
+        <result column="create_time" property="createTime" />
+        <result column="verify_code" property="verifyCode" />
+        <result column="verify_code_time" property="verifyCodeTime" />
+        <result column="ischeck" property="ischeck" />
+        <result column="status" property="status" />
+    </resultMap>
+
+    <select id="getTeachersByStudentId" resultMap="TeaMap_1" parameterType="Integer">
+        select mt.*,st.* from student_teacher st,m_teacher mt
+          where mt.id = st.teacher_id and st.student_id = #{id}
+    </select>
+
+
+
+    <resultMap id="StuMap_1" type="com.ssrs.model.Student">
+        <id column="id" property="id" />
+        <result column="login_id" property="loginId" />
+        <result column="login_pwd" property="loginPwd" />
+        <result column="touxiang" property="touxiang" />
+        <result column="nickname" property="nickname" />
+        <result column="mobile" property="mobile" />
+        <result column="create_time" property="createTime" />
+        <result column="verify_code" property="verifyCode" />
+        <result column="verify_code_time" property="verifyCodeTime" />
+        <result column="ischeck" property="ischeck" />
+        <result column="status" property="status" />
+    </resultMap>
+
+    <select id="getStudentsByTeacherId" resultMap="StuMap_1" parameterType="Integer">
+        select mt.*,st.* from student_teacher st,m_student mt
+          where mt.id = st.student_id and st.teacher_id = #{id}
+    </select>
+</mapper>

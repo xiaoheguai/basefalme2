@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssrs.mapper.WorksMapper">
+
+    <!-- 开启二级缓存 -->
+    <!--<cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>-->
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ssrs.model.Works">
+        <id column="id" property="id" />
+        <result column="works_name" property="worksName" />
+        <result column="works_type_id" property="worksTypeId" />
+        <result column="works_describe" property="worksDescribe" />
+        <result column="works_url" property="worksUrl" />
+        <result column="wan_to_goods" property="wanToGoods" />
+        <result column="is_goods" property="isGoods" />
+        <result column="goods_id" property="goodsId" />
+        <result column="upload_time" property="uploadTime" />
+        <result column="hits" property="hits" />
+        <result column="user_type" property="userType" />
+        <result column="user_id" property="userId" />
+        <result column="user_name" property="userName" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, works_name, works_type_id, works_describe, works_url, wan_to_goods, is_goods, goods_id, upload_time, hits, user_id, user_name
+    </sql>
+
+    <resultMap id="TouLanResultMap" type="com.ssrs.model.Rcourse">
+        <id column="id" property="id" />
+        <result column="works_name" property="courseName" />
+        <result column="works_describe" property="courseDescribe" />
+        <result column="works_type" property="courseType" />
+        <result column="works_url" property="courseUrl" />
+        <result column="upload_time" property="uploadTime" />
+        <result column="hits" property="hits" />
+        <result column="goods_id" property="goodsId" />
+        <result column="goods_type" property="goodsType" />
+        <result column="goods_price" property="goodsPrice" />
+        <result column="user_id" property="makerId" />
+        <result column="user_name" property="makerName" />
+    </resultMap>
+
+  <select id="selectByPage" parameterType="java.util.Map" resultMap="TouLanResultMap">
+
+      select
+            id,works_name,works_describe,2 works_type,works_url,upload_time,
+            goods_id ,goods_type ,goods_price,hits,user_id,user_name
+      from
+            m_works
+      where
+            user_id = #{page.id}
+      limit #{page.begin},#{page.size}
+  </select>
+
+    <select id="selectAllVideoByPage" parameterType="java.util.Map" resultMap="TouLanResultMap">
+    select
+        a.id,a.works_name,a.works_describe,a.works_type,a.works_url,a.upload_time,
+        a.hits,a.goods_id ,a.goods_type
+        ,a.goods_price,a.user_id,a.user_name
+    from
+      (
+          select
+                id,works_name,works_describe,2 works_type,works_url,upload_time,
+                goods_id ,goods_type ,goods_price,hits,user_id,user_name
+          from
+                m_works
+          where
+                user_id != #{page.id}
+          and
+                is_goods = 1
+      union all
+           select
+                id,course_name  works_name,course_describe works_describe,course_type works_type,course_url
+                works_url,upload_time upload_time,
+                goods_id ,goods_type ,goods_price,hits hits,maker_id user_id,maker_name user_name
+          from
+                m_rcourse
+
+      union all
+           select
+                id,course_name  works_name,course_describe works_describe,course_type works_type,course_url
+                works_url,upload_time upload_time,goods_id ,goods_type ,goods_price,
+                hits hits,maker_id user_id,maker_name user_name
+          from
+                m_ccourse
+
+      ) a
+      limit #{page.begin},#{page.size}
+  </select>
+
+    <select id="selectCountByPage" parameterType="Long" resultType="Integer">
+         select
+            count(id)
+      from
+            m_works
+      where
+            user_id = #{id}
+    </select>
+
+    <select id="selectCountAllVideoByPage" parameterType="Long" resultType="Integer">
+         select
+            count(a.id)
+     from
+      (
+          select
+                id,works_name,works_describe,works_url,upload_time,hits,user_id,user_name
+          from
+                m_works
+          where
+                user_id = #{id}
+      union all
+           select
+                id,course_name  works_name,course_describe works_describe,course_url
+                works_url,upload_time upload_time,hits hits,maker_id user_id,maker_name user_name
+          from
+                m_rcourse
+
+      union all
+           select
+                id,course_name  works_name,course_describe works_describe,course_url
+                works_url,upload_time upload_time,hits hits,maker_id user_id,maker_name user_name
+          from
+                m_ccourse
+
+      ) a
+    </select>
+
+    <select id="selectVidoeByTypeAndId" parameterType="java.util.Map" resultMap="TouLanResultMap">
+        <choose>
+            <when test="video.type == 0">
+                select
+                  id,course_name  works_name,course_describe works_describe,course_type works_type,course_url
+                  works_url,upload_time upload_time,goods_id ,goods_type ,goods_price,
+                  hits hits,maker_id user_id,maker_name user_name
+                from
+                  m_rcourse
+                where
+                  id = #{video.id}
+            </when>
+            <when test="video.type == 1">
+                select
+                  id,course_name  works_name,course_describe works_describe,course_type works_type,course_url
+                  works_url,upload_time upload_time,goods_id ,goods_type ,goods_price,
+                  hits hits,maker_id user_id,maker_name user_name
+                from
+                  m_ccourse
+                where
+                  id = #{video.id}
+            </when>
+            <when test="video.type == 2">
+                select
+                  id,works_name,works_describe,works_url,upload_time,goods_id ,goods_type ,goods_price,
+                  hits,user_id,user_name
+                from
+                  m_works
+                where
+                  id = #{video.id}
+            </when>
+        </choose>
+    </select>
+
+    <update id="updateHits" parameterType="java.util.Map" >
+        <choose>
+            <when test="hitmap.type == 0">
+                update
+                  m_rcourse
+                set
+                  hits = hits+1
+                where
+                  id = #{hitmap.id}
+            </when>
+            <when test="hitmap.type == 1">
+                update
+                  m_ccourse
+                set
+                  hits = hits+1
+                where
+                  id = #{hitmap.id}
+            </when>
+            <when test="hitmap.type == 2">
+                update
+                  m_works
+                set
+                  hits = hits+1
+                where
+                  id = #{hitmap.id}
+            </when>
+        </choose>
+        </update>
+
+
+    <select id="selectByRcourseUserId" parameterType="Long" resultType="com.ssrs.permission.model.User">
+        select
+         id,nickname,email,pswd,create_time createTime,last_login_time lastLoginTime,status
+        from
+            ssrs_user
+        where
+          id =
+           (
+            select
+              maker_id
+            from
+              m_rcourse
+            where
+              id = #{id}
+           )
+    </select>
+
+    <select id="selectByCcourseUserId" parameterType="Long" resultType="com.ssrs.permission.model.User">
+        select
+         id,nickname,email,pswd,create_time createTime,last_login_time lastLoginTime,status
+        from
+            ssrs_user
+        where
+          id =
+           (
+            select
+              maker_id
+            from
+              m_ccourse
+            where
+              id = #{id}
+           )
+    </select>
+
+    <select id="selectByWorksUserId" parameterType="Long" resultType="com.ssrs.vo.MUserVo">
+        select a.*
+        from
+         (
+             select
+             id,login_id loginId,login_pwd loginPwd,touxiang,nickname,sign,mobile,create_time createTime,
+             verify_code verifyCode,verify_code_time verifyCodeTime,ischeck,status,1 isStudent,now() lastLoginTime
+            from
+                m_student
+            where
+              id =
+               (
+                select
+                  user_id
+                from
+                  m_works
+                where
+                  id = #{id}
+               )
+               and
+                0 =
+                 (
+                  select
+                    user_type
+                  from
+                    m_works
+                  where
+                    id = #{id}
+                 )
+                 union all
+
+                 select
+                  id,login_id loginId,login_pwd loginPwd,touxiang,nickname,sign,mobile,create_time createTime,
+                  verify_code verifyCode,verify_code_time verifyCodeTime,ischeck,status,0 isStudent,now() lastLoginTime
+                 from
+                    m_teacher
+                 where
+                  id =
+                   (
+                    select
+                      user_id
+                    from
+                      m_works
+                    where
+                      id = #{id}
+                   )
+                   and
+                    1 =
+                     (
+                      select
+                        user_type
+                      from
+                        m_works
+                      where
+                        id = #{id}
+                     )
+         ) a
+
+    </select>
+
+    <select id="checkXiaJia" parameterType="Long" resultType="Integer">
+        select count(id) from m_purchase_mingxi where goods_id = (select goods_id from m_works where id = #{id})
+    </select>
+
+    <delete id="deleteGoodsByWorksId" parameterType="Long">
+        delete from m_goods where id = (select goods_id from m_works where id = #{id})
+    </delete>
+
+    <update id="goToXiaJia" parameterType="Long" >
+        update m_works set is_goods = 0, goods_id = NULL ,goods_type = NULL ,goods_price = 0.00 where id = #{id}
+    </update>
+
+    <update id="updateByShangJia" parameterType="com.ssrs.model.Works" >
+        update m_works set is_goods = 1,goods_id = #{goodsId},goods_type = #{goodsType},
+            goods_price = #{goodsPrice} where id = #{id};
+    </update>
+</mapper>

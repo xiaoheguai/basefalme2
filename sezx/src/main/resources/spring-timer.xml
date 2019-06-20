@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+ 	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd 
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-4.0.xsd 
+	http://www.springframework.org/schema/task
+	http://www.springframework.org/schema/task/spring-task-4.0.xsd
+	http://www.springframework.org/schema/mvc 
+	http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+
+	<!--<task:executor id="executor" pool-size="5" />  -->
+    <!--<task:scheduler id="scheduler" pool-size="10" />  -->
+    <!--<task:annotation-driven executor="executor" scheduler="scheduler" />-->
+<!--清除日志定时任务开始-->
+	<bean id="cleanSystemLogJob" class="com.ssrs.core.timer.CleanSystemLogTask"/>
+	<bean id="cleanSystemLogJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="group" value="job_work"/>
+		<property name="name" value="job_work_name"/>
+		<!--false表示等上一个任务执行完后再开启新的任务-->
+		<property name="concurrent" value="false"/>
+		<property name="targetObject">
+			<ref bean="cleanSystemLogJob"/>
+		</property>
+		<property name="targetMethod">
+			<value>run</value>
+		</property>
+	</bean>
+
+	<!--  调度触发器 -->
+	<bean id="cleanSystemLogTrigger"
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="name" value="work_default_name"/>
+		<property name="group" value="work_default"/>
+		<property name="jobDetail">
+			<ref bean="cleanSystemLogJobDetail" />
+		</property>
+		<property name="cronExpression">
+			<!--测试用的-->
+			<!--<value>0/10 * * * * ?</value>-->
+			<!--每天2点触发-->
+			<value>0 0 2 * * ?</value>
+		</property>
+	</bean>
+	<!--清除日志定时任务结束-->
+
+	<!--初始化数据库定时任务开始-->
+	<bean id="initQuellaDataJob" class="com.ssrs.core.timer.InitQuellaDataTask"/>
+	<bean id="initQuellaDataJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="group" value="job_work_2"/>
+		<property name="name" value="job_work_name_2"/>
+		<!--false表示等上一个任务执行完后再开启新的任务-->
+		<property name="concurrent" value="false"/>
+		<property name="targetObject">
+			<ref bean="initQuellaDataJob"/>
+		</property>
+		<property name="targetMethod">
+			<value>run</value>
+		</property>
+	</bean>
+	<!--初始化数据库定时任务结束-->
+	  <!--调度触发器-->
+	<bean id="initQuellaDataTrigger"
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="name" value="work_default_name_2"/>
+		<property name="group" value="work_default_2"/>
+		<property name="jobDetail">
+			<ref bean="initQuellaDataJobDetail" />
+		</property>
+		<property name="cronExpression">
+			<!--测试用的-->
+			<!--<value>0/10 * * * * ?</value>-->
+			<value>0 0 0/1 * * ?</value>
+		</property>
+	</bean>
+
+
+	<!-- 测试删文件-->
+	<bean id="InitDeleteFileJob" class="com.ssrs.core.timer.DeleteFileTask"></bean>
+	<bean id="InitDeleteFileJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="group" value="group3"></property>
+		<property name="name" value="name3"></property>
+		<property name="concurrent" value="false"></property>
+		<property name="targetObject" ref="InitDeleteFileJob"></property>
+		<property name="targetMethod" >
+			<value>delete</value>
+		</property>
+	</bean>
+
+	<bean id="InitDeleteFileTrigger"
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="name" value="work_default_name_3"/>
+		<property name="group" value="work_default_3"/>
+		<property name="jobDetail">
+			<ref bean="InitDeleteFileJobDetail" />
+		</property>
+		<property name="cronExpression">
+			<!--测试用的-->
+			<!--<value>0/10 * * * * ?</value>-->
+			<value>30 * * * * ?</value>
+		</property>
+	</bean>
+	<!-- 调度工厂 -->
+	<bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="cleanSystemLogTrigger"/>
+				<!--<ref bean="initQuellaDataTrigger"/>-->
+				<ref bean="InitDeleteFileTrigger"/>
+			</list>
+		</property>
+	</bean>
+</beans>

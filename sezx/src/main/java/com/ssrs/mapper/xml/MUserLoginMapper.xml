@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssrs.mapper.MUserLoginMapper">
+
+
+    <!--&lt;!&ndash; 开启二级缓存 &ndash;&gt;-->
+    <!--<cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>-->
+
+
+
+    <resultMap id="MResultMap" type="com.ssrs.vo.MUserVo">
+        <id column="id" property="id" />
+        <result column="login_id" property="loginId" />
+        <result column="login_pwd" property="loginPwd" />
+        <result column="touxiang" property="touxiang" />
+        <result column="nickname" property="nickname" />
+        <result column="sign" property="sign" />
+        <result column="mobile" property="mobile" />
+        <result column="create_time" property="createTime" />
+        <result column="verify_code" property="verifyCode" />
+        <result column="verify_code_time" property="verifyCodeTime" />
+        <result column="ischeck" property="ischeck" />
+        <result column="status" property="status" />
+        <result column="isstudent" property="isStudent" />
+    </resultMap>
+
+
+    
+    <select id="getMUserById" resultMap="MResultMap" parameterType="Long">
+       SELECT
+	a.id,
+	a.login_id,
+	a.login_pwd,
+	a.touxiang,
+	a.nickname,
+	a.sign,
+	a.mobile,
+	a.create_time,
+	a.verify_code,
+	a.verify_code_time,
+	a.ischeck,
+	a.STATUS,
+	a.isstudent
+FROM
+	(
+		SELECT
+			u.id AS id,
+			u.login_id AS login_id,
+			u.login_pwd AS login_pwd,
+			u.touxiang AS touxiang,
+			u.nickname AS nickname,
+			u.sign AS sign,
+			u.mobile AS mobile,
+			u.create_time AS create_time,
+			u.verify_code AS verify_code,
+			u.verify_code_time AS verify_code_time,
+			u.ischeck AS ischeck,
+			u. STATUS AS STATUS,
+			1 AS isstudent
+		FROM
+			m_student u
+		WHERE
+			u.login_id = #{loginId}
+			AND u.login_pwd = #{loginPwd}
+		UNION ALL
+			SELECT
+				t.id AS id,
+				t.login_id AS login_id,
+				t.login_pwd AS login_pwd,
+				t.touxiang AS touxiang,
+				t.nickname AS nickname,
+			    t.sign AS sign,
+				t.mobile AS mobile,
+				t.create_time AS create_time,
+				t.verify_code AS verify_code,
+				t.verify_code_time AS verify_code_time,
+				t.ischeck AS ischeck,
+				t.STATUS AS STATUS,
+				0 AS isstudent
+			FROM
+				m_teacher t
+			WHERE
+				t.login_id = #{loginId}
+			AND t.login_pwd = #{loginPwd}
+	) a
+    </select>
+
+
+    <select id="selectOne" parameterType="com.ssrs.vo.MUserVo" resultMap="MResultMap">
+         SELECT
+	a.id,
+	a.login_id,
+	a.login_pwd,
+	a.touxiang,
+	a.nickname,
+	a.sign,
+	a.mobile,
+	a.create_time,
+	a.verify_code,
+	a.verify_code_time,
+	a.ischeck,
+	a.STATUS,
+	a.isstudent
+FROM
+	(
+		SELECT
+			u.id AS id,
+			u.login_id AS login_id,
+			u.login_pwd AS login_pwd,
+			u.touxiang AS touxiang,
+			u.nickname AS nickname,
+			u.sign AS sign,
+			u.mobile AS mobile,
+			u.create_time AS create_time,
+			u.verify_code AS verify_code,
+			u.verify_code_time AS verify_code_time,
+			u.ischeck AS ischeck,
+			u. STATUS AS STATUS,
+			1 AS isstudent
+		FROM
+			m_student u
+		WHERE
+			u.login_id = #{loginId}
+			AND u.login_pwd = #{loginPwd}
+		UNION ALL
+			SELECT
+				t.id AS id,
+				t.login_id AS login_id,
+				t.login_pwd AS login_pwd,
+				t.touxiang AS touxiang,
+				t.nickname AS nickname,
+				t.sign AS sign,
+				t.mobile AS mobile,
+				t.create_time AS create_time,
+				t.verify_code AS verify_code,
+				t.verify_code_time AS verify_code_time,
+				t.ischeck AS ischeck,
+				t.STATUS AS STATUS,
+				0 AS isstudent
+			FROM
+				m_teacher t
+			WHERE
+				t.login_id = #{loginId}
+			AND t.login_pwd = #{loginPwd}
+	) a
+    </select>
+
+    <update id="updateById" parameterType="com.ssrs.vo.MUserVo">
+        update
+          <if test="isStudent == 1">
+              m_student
+          </if>
+        <if test="isStudent == 0">
+            m_teacher
+        </if>
+        set
+        login_id = #{loginId},
+        login_pwd = #{loginPwd},
+        touxiang = #{touxiang},
+        nickname = #{nickname},
+        mobile = #{mobile}
+        where
+        id = #{id};
+    </update>
+
+
+
+
+</mapper>

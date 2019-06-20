@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssrs.mapper.TestMapper">
+
+    <!-- 开启二级缓存 -->
+     <!--<cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>-->
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ssrs.model.Test">
+        <id column="id" property="id" />
+        <result column="question" property="question" />
+        <result column="question_no" property="questionNo" />
+        <result column="course_id" property="courseId" />
+        <result column="course_type" property="courseType" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, question, question_no, course_id, course_type
+    </sql>
+
+    <select id="getListByWorksId" parameterType="com.ssrs.vo.TestVo" resultMap="BaseResultMap">
+        select * from m_test where course_id = #{courseId} and course_type = #{courseType};
+    </select>
+
+    <select id="getNextId" resultType="Long" >
+        select ifnull(max(id),0)+1 from m_test;
+    </select>
+
+    <insert id="insertAndId" parameterType="com.ssrs.model.Test" useGeneratedKeys="true" keyProperty="id" >
+        insert into m_test (
+              question,question_no,course_id,course_type
+        ) values (
+              #{question},#{questionNo},#{courseId},#{courseType}
+        )
+    </insert>
+
+</mapper>

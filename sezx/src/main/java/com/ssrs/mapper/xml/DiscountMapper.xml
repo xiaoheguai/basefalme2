@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssrs.mapper.DiscountMapper">
+
+    <!-- 开启二级缓存 -->
+    <!--<cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>-->
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ssrs.model.Discount">
+        <id column="id" property="id" />
+        <result column="discount_name" property="discountName" />
+        <result column="discount_expression" property="discountExpression" />
+        <result column="goods_type_id" property="goodsTypeId" />
+        <result column="begin_time" property="beginTime" />
+        <result column="end_time" property="endTime" />
+        <result column="is_open" property="isOpen" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, discount_name, discount_expression, goods_type_id, begin_time, end_time, is_open
+    </sql>
+
+  <update id="updateOpenById" parameterType="com.ssrs.vo.OpenVo">
+      update m_discount set is_open = #{isOpen} where id = #{id};
+  </update>
+
+  <select id="selectOpen" resultMap="BaseResultMap">
+      select * from m_discount where is_open = 1;
+  </select>
+
+</mapper>

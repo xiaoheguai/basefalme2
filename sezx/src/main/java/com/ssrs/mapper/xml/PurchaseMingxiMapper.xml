@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssrs.mapper.PurchaseMingxiMapper">
+
+    <!-- 开启二级缓存 -->
+    <!--<cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>-->
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ssrs.model.PurchaseMingxi">
+        <id column="id" property="id" />
+        <result column="goods_id" property="goodsId" />
+        <result column="goods_name" property="goodsName" />
+        <result column="goods_unit_price" property="goodsUnitPrice" />
+        <result column="goods_amount" property="goodsAmount" />
+        <result column="goods_total_price" property="goodsTotalPrice" />
+        <result column="purchase_xinxi_id" property="purchaseXinxiId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, goods_id, goods_name, goods_unit_price, goods_amount, goods_total_price, purchase_xinxi_id
+    </sql>
+
+    <select id="getBeansByPXId" parameterType="Long" resultMap="BaseResultMap">
+        select * from m_purchase_mingxi where purchase_xinxi_id = #{id}
+    </select>
+
+</mapper>

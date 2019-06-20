@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssrs.mapper.GoodsMapper">
+
+    <!-- 开启二级缓存 -->
+    <!--<cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>-->
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ssrs.model.Goods">
+        <id column="id" property="id" />
+        <result column="goods_name" property="goodsName" />
+        <result column="goods_type" property="goodsType" />
+        <result column="goods_describe" property="goodsDescribe" />
+        <result column="goods_unit_price" property="goodsUnitPrice" />
+        <result column="user_id" property="userId" />
+        <result column="user_name" property="userName" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, goods_name, goods_type, goods_describe, goods_unit_price
+    </sql>
+
+    <insert id="insertGetId" parameterType="com.ssrs.model.Goods" useGeneratedKeys="true" keyProperty="id">
+        insert into m_goods
+          (goods_name,goods_type,goods_unit_price,user_id,user_name)
+          values
+          (#{goodsName},#{goodsType},#{goodsUnitPrice},#{userId},#{userName});
+    </insert>
+
+</mapper>

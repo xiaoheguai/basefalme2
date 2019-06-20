@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssrs.mapper.StudentMapper">
+
+
+    <!--&lt;!&ndash; 开启二级缓存 &ndash;&gt;-->
+    <!--<cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>-->
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.ssrs.model.Student">
+        <id column="id" property="id" />
+        <result column="login_id" property="loginId" />
+        <result column="login_pwd" property="loginPwd" />
+        <result column="touxiang" property="touxiang" />
+        <result column="nickname" property="nickname" />
+        <result column="sign" property="sign" />
+        <result column="mobile" property="mobile" />
+        <result column="create_time" property="createTime" />
+        <result column="verify_code" property="verifyCode" />
+        <result column="verify_code_time" property="verifyCodeTime" />
+        <result column="ischeck" property="ischeck" />
+        <result column="status" property="status" />
+        <collection property="teachers" column="id" ofType="com.ssrs.model.Teacher"
+                    select="com.ssrs.mapper.StudentTeacherMapper.getTeachersByStudentId"></collection>
+    </resultMap>
+
+    <resultMap id="sResultMap" type="com.ssrs.model.Student">
+        <id column="id" property="id" />
+        <result column="login_id" property="loginId" />
+        <result column="login_pwd" property="loginPwd" />
+        <result column="touxiang" property="touxiang" />
+        <result column="nickname" property="nickname" />
+        <result column="sign" property="sign" />
+        <result column="mobile" property="mobile" />
+        <result column="create_time" property="createTime" />
+        <result column="verify_code" property="verifyCode" />
+        <result column="verify_code_time" property="verifyCodeTime" />
+        <result column="ischeck" property="ischeck" />
+        <result column="status" property="status" />
+        <collection property="teachers" column="id" ofType="com.ssrs.model.Teacher"
+                    select="com.ssrs.mapper.StudentTeacherMapper.getTeachersByStudentId"></collection>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, login_id, login_pwd, touxiang, nickname, mobile, create_time, verify_code, verify_code_time, ischeck, status
+    </sql>
+    
+    <select id="getBeanById" resultMap="sResultMap" parameterType="Long">
+        select *
+          from m_student
+          where id = #{id}
+    </select>
+
+    <select id="getAllBean" resultMap="sResultMap" resultType="ArrayList">
+        select *
+          from m_student
+    </select>
+
+    <insert id="insertByReducePoJo" parameterType="com.ssrs.model.Student" >
+          insert m_student
+            (
+                login_id,login_pwd,touxiang,nickname,sign,mobile,create_time
+            )
+            values
+            (
+                #{loginId},#{loginPwd},#{touxiang},#{nickname},#{sign},#{mobile},#{createTime}
+            )
+    </insert>
+
+    <update id="updateByReducePoJo" parameterType="com.ssrs.model.Student" >
+          update m_student set
+                login_id = #{loginId},
+                touxiang = #{touxiang},
+                nickname = #{nickname},
+                mobile = #{mobile}
+                where
+                  id = #{id};
+    </update>
+
+    <update id="updateByParam" parameterType="java.util.HashMap">
+              update m_student
+
+                <set>
+                    <if test="param.loginId != null and param.loginId !=''">
+                        login_id = #{param.loginId},
+                    </if>
+                    <if test="param.touxiang != null and param.touxiang !=''">
+                        touxiang = #{param.touxiang},
+                    </if>
+                    <if test="param.nickname != null and param.nickname !=''">
+                        nickname = #{param.nickname},
+                    </if>
+                    <if test="param.sign != null and param.sign !=''">
+                        sign = #{param.sign},
+                    </if>
+                    <if test="param.mobile != null and param.mobile !=''">
+                        mobile = #{param.mobile},
+                    </if>
+                </set>
+              where
+                  <choose>
+                    <when test="param.id != null and param.id !=''">
+                        id = #{param.id}
+                    </when>
+                    <otherwise>
+                        1>1
+                    </otherwise>
+                  </choose>
+    </update>
+
+    <update id="updatePWD" parameterType="com.ssrs.vo.MUserVo" >
+        update
+        <choose>
+            <when test="isStudent == 1">
+                m_student
+            </when>
+            <otherwise>
+                m_teacher
+            </otherwise>
+        </choose>
+        set
+          login_pwd = #{loginPwd}
+        where
+          id =${id}
+
+    </update>
+
+
+    <insert id="insertByRLogin" parameterType="com.ssrs.model.Student" >
+        insert into
+          <choose>
+              <when test="isStudent == 1">
+                   m_student
+              </when>
+              <otherwise>
+                   m_teacher
+              </otherwise>
+          </choose>
+            (
+                login_id,login_pwd,nickname,mobile,create_time
+            )
+        values
+            (
+              #{loginId},#{loginPwd},#{nickname},#{mobile},#{createTime}
+            )
+    </insert>
+
+    <select id="checkNickname" parameterType="java.util.Map" resultType="Integer">
+        select ifnull(sum(a.shulaing),0) from
+        (
+          select count(id) shulaing  from m_student where login_id = #{map.loginId}
+          union all
+          select count(id) shulaing from m_teacher where login_id = #{map.loginId}
+        ) a
+
+
+
+    </select>
+
+</mapper>
